@@ -42,10 +42,39 @@ let submitting = false;
 
 document.getElementById("currentYear").textContent = new Date().getFullYear();
 
+/* DYNAMIC DEADLINE CHECK ON LOAD */
+
+function checkDeadlines() {
+  const now = new Date();
+  
+  document.querySelectorAll(".event-card[data-deadline]").forEach(function (card) {
+    const deadlineStr = card.dataset.deadline; // YYYY-MM-DD
+    const deadlineDate = new Date(deadlineStr + "T23:59:59");
+    
+    if (now > deadlineDate) {
+      const button = card.querySelector(".event-button");
+      const badge = card.querySelector(".event-deadline");
+      
+      if (button) {
+        button.disabled = true;
+        button.innerHTML = "Registration closed";
+      }
+      
+      if (badge) {
+        badge.classList.add("expired");
+        badge.innerHTML = `<span class="deadline-icon">⚠️</span> <span>Registration Closed</span>`;
+      }
+    }
+  });
+}
+
+checkDeadlines();
+
 /* OPEN THE CORRECT EVENT FORM */
 
 document.querySelectorAll("[data-event]").forEach(function (button) {
   button.addEventListener("click", function () {
+    if (button.disabled) return;
     openRegistration(button.dataset.event);
   });
 });
